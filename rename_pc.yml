@@ -1,0 +1,26 @@
+---
+- hosts: all
+  gather_facts: false
+
+  vars_prompt:
+  - name: username
+    prompt: "Enter username"
+    private: no
+  - name: password
+    prompt: "Enter password"
+  - name: new_hostname
+    prompt: "Enter new hostname"
+    private: no
+
+  vars:
+    ansible_user: "{{ username }}"
+    ansible_password: "{{ password }}"
+    ansible_port: 5985
+    ansible_connection: winrm
+    ansible_winrm_transport: ntlm
+    ansible_winrm_server_cert_validation: ignore
+
+  tasks:
+  - name: Changing hostname to new hostname
+    win_hostname:
+      name: "{{ new_hostname }}"

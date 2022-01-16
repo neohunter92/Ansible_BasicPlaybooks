@@ -1,0 +1,43 @@
+---
+- hosts: all
+  gather_facts: false
+
+  vars_prompt:
+  - name: username
+    prompt: "Enter username"
+    private: no
+  - name: password
+    prompt: "Enter password"
+  - name: dom_username
+    prompt: "Enter domain admin username"
+    private: no
+  - name: admin_password
+    prompt: "Enter domain admin password"
+  - name: domain_name
+    prompt: "Enter domain name"
+    private: no
+  - name: hostname
+    prompt: "Enter server hostname"
+  - name: ad_ou
+    prompt: "Enter OU distinguishedname"
+
+  vars:
+    ansible_user: "{{ username }}"
+    ansible_password: "{{ password }}"
+    ansible_port: 5985
+    ansible_connection: winrm
+    ansible_winrm_transport: ntlm
+    ansible_winrm_server_cert_validation: ignore
+
+  tasks:
+  - ansible.windows.win_domain_membership:
+      dns_domain_name: "{{ domain_name }}"
+      hostname: "{{ hostname }}"
+      domain_admin_user: "{{ dom_username }}"
+      domain_admin_password: "{{ admin_password }}"
+      domain_ou_path: "{{ ad_ou }}"
+      state: domain
+    register: domain_state
+
+  - ansible.windows.win_reboot:
+    when: domain_state.reboot_required
