@@ -1,0 +1,37 @@
+---
+- hosts: all
+  gather_facts: false
+
+  vars_prompt:
+  - name: username
+    prompt: "Enter local username"
+    private: no
+  - name: password
+    prompt: "Enter local user password"
+  - name: domain_user
+    prompt: "Enter domain admin username"
+    private: no
+  - name: domain_admin_pw
+    prompt: "Enter domain admin password"
+  - name: domain_name
+    prompt: "Enter domain name"
+    private: no
+  - name: safe_mode_pw
+    prompt: "Enter safe mode password"
+
+  vars:
+    ansible_user: "{{ username }}"
+    ansible_password: "{{ password }}"
+    ansible_port: 5985
+    ansible_connection: winrm
+    ansible_winrm_transport: ntlm
+    ansible_winrm_server_cert_validation: ignore
+
+  tasks:
+  - name: Promote this server to Additional DC
+    win_domain_controller:
+      dns_domain_name: "{{ domain_name }}"
+      domain_admin_user: "{{ domain_user }}"
+      domain_admin_password: "{{ domain_admin_pw }}"
+      safe_mode_password: "{{ safe_mode_pw }}"
+      state: domain_controller
